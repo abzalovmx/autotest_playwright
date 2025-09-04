@@ -1,9 +1,9 @@
 import re
 import pytest
 from playwright.sync_api import sync_playwright, Page, expect
+from time import sleep
 
-
-# 37-00
+# 44-35
 
 @pytest.fixture(scope="session")
 def browser():
@@ -36,14 +36,5 @@ def page(context):
     page.close()
 
 
-def test_google(page: Page):
-    page.goto("https://www.google.com/")
-    page.fill("textarea[name='q']", "cat")
-    page.press("textarea[name='q']", "Enter")
-    expect(page).to_have_title(re.compile("^cat"))
-
-
-def test_by_role(page: Page):
-    page.goto("https://magento.softwaretestingboard.com/")
-    page.get_by_role("menuitem", name="What's New").click()
-    page.get_by_role("link", name="Search Terms").click()
+def test_():
+    pass

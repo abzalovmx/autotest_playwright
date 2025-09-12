@@ -1,8 +1,8 @@
 import re
-import pytest, requests
-from playwright.sync_api import sync_playwright, Page, expect, BrowserContext, Dialog, Request
+import pytest, requests, json
+from playwright.sync_api import sync_playwright, Page, expect, BrowserContext, Dialog, Request, Route
 
-# 41-14
+# 1-03-15
 
 @pytest.fixture(scope="session")
 def browser():
@@ -46,6 +46,7 @@ def test_listen(page: Page):
     input_field.fill('some text')
     input_field.press('Enter')
 
+
 def test_catch_res(page: Page):
     page.goto('https://www.airbnb.ru/')
     with page.expect_response('**/autosuggestions**') as response_event:
@@ -53,4 +54,39 @@ def test_catch_res(page: Page):
     response = response_event.value
     print(response.url)
     print(response.status)
-    print(response.json())
+    response_data = response.json()
+    assert response_data['show_nearby'] is False
+
+
+def test_pogoda(page: Page):
+    def handle_route(route: Route):
+        response = route.fetch()
+        body = response.json()
+        body['temperature'] = '+332'
+        body['icon'] = 'A2'
+        body = json.dumps(body)
+        route.fulfill(response=response, body=body)
+
+    def handel_route2(route: Route):
+        url = route.request.url
+        url = url.replace('api/', '')
+        route.continue_(url=url)
+
+    page.route('**/pogoda/**', handle_route)
+    page.goto('https://www.onliner.by/')
+    page.click('[name="query"]')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
